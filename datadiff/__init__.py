@@ -58,7 +58,7 @@ def unified_diff_strings(a, b, fromfile='', tofile='', fromfiledate='', tofileda
 def diff(a, b, context=3, depth=0, fromfile='a', tofile='b'):
     if type(a) != type(b):
         raise DiffTypeError('Types differ: %s=%s %s=%s  Values of a and b are: %r, %r' % (fromfile, tofile, type(a), type(b), a, b))
-    if type(a) == str:
+    if isinstance(a, basestring):
         # special cases
         if '\n' in a or '\n' in b:
             return unified_diff_strings(a, b, fromfile=fromfile, tofile=tofile, context=context)
