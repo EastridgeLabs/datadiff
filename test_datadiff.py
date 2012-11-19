@@ -37,8 +37,19 @@ def test_diff_oneline_strings():
 def test_diff_multiline_strings():
     d = diff('abc\ndef\nghi', 'abc\nghi', fromfile="x", tofile="y")
     expected = dedent('''\
-        --- x 
-        +++ y 
+        --- x
+        +++ y
+        @@ -1,3 +1,2 @@
+         abc
+        -def
+         ghi''')
+    assert_equal(str(d), expected)
+
+def test_diff_unicode_vs_str():
+    d = diff(u'abc\ndef\nghi', b'abc\nghi', fromfile="x", tofile="y")
+    expected = dedent('''\
+        --- x
+        +++ y
         @@ -1,3 +1,2 @@
          abc
         -def
@@ -163,7 +174,7 @@ def test_diff_seq_objects():
             return iter(self.list)
         def __getitem__(self, x):
             return self.list[x]
-    
+
     d = diff(FooSeq([1]), FooSeq([1,2]), fromfile="x", tofile="y")
     expected = dedent('''\
         --- x
@@ -181,9 +192,9 @@ def test_diff_almost_seq_objects():
             self.list = list
         def __iter__(self):
             return iter(self.list)
-    
+
     assert_raises(DiffTypeError, diff, FooSeq([1]), FooSeq([1,2]))
-  
+
 def test_tuple():
     d = diff((1,2), (1,3), fromfile="x", tofile="y")
     expected = dedent('''\
@@ -283,10 +294,10 @@ def test_diff_frozenset():
 def test_eval_bool():
     d = diff([1], [1], fromfile="x", tofile="y")
     assert_equal(bool(d), False)
-    
+
     d = diff([1], [2], fromfile="x", tofile="y")
     assert_equal(bool(d), True)
-    
+
     d = diff(dict(a=1), dict(a=1), fromfile="x", tofile="y")
     assert_equal(bool(d), False)
 
@@ -301,12 +312,12 @@ def test_diff_types():
 @raises(Exception)
 def test_DataDiff_init_params():
     DataDiff(list, '[')
-    
+
 def test_DataDiff_change_type():
     dd = DataDiff(list, '[', ']')
     dd.multi('foobar', [1234])
     assert_raises(Exception, str, dd)
-    
+
 def test_unhashable_type():
     a = []
     b = [slice(1)]
@@ -333,7 +344,7 @@ def test_recursive_list():
          3,
         ]''')
     assert_equal(str(d), expected)
-    
+
 def test_recursive_tuple_different_types():
     a = (1, (7, 8,  9, 10, 11), 3)
     b = (1, (7, 8, 'a', 10, 11), 3)
@@ -356,7 +367,7 @@ def test_recursive_tuple_different_types():
          3,
         )''')
     assert_equal(str(d), expected)
-    
+
 def test_recursive_dict():
     a = dict(a=1, b=dict(foo=17, bar=19), c=3)
     b = dict(a=1, b=dict(foo=17,       ), c=3)
@@ -373,7 +384,7 @@ def test_recursive_dict():
          'c': 3,
         }''')
     assert_equal(str(d), expected)
-    
+
 def test_recursive_set():
     a = set([1, 2, frozenset([3, 4, 5]), 8])
     b = set([1, 2, frozenset([3, 2, 5]), 8])

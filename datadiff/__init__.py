@@ -56,9 +56,7 @@ def unified_diff_strings(a, b, fromfile='', tofile='', fromfiledate='', tofileda
                                   lineterm=''))
 
 def diff(a, b, context=3, depth=0, fromfile='a', tofile='b'):
-    if type(a) != type(b):
-        raise DiffTypeError('Types differ: %s=%s %s=%s  Values of a and b are: %r, %r' % (fromfile, tofile, type(a), type(b), a, b))
-    if isinstance(a, basestring):
+    if isinstance(a, basestring) and isinstance(b, basestring):
         # special cases
         if '\n' in a or '\n' in b:
             return unified_diff_strings(a, b, fromfile=fromfile, tofile=tofile, context=context)
@@ -66,6 +64,8 @@ def diff(a, b, context=3, depth=0, fromfile='a', tofile='b'):
             # even though technically it is a sequence,
             # we don't want to diff char-by-char
             raise DiffNotImplementedForType(str)
+    if type(a) != type(b):
+        raise DiffTypeError('Types differ: %s=%s %s=%s  Values of a and b are: %r, %r' % (fromfile, tofile, type(a), type(b), a, b))
     if type(a) == dict:
         return diff_dict(a, b, context, depth, fromfile=fromfile, tofile=tofile)
     if hasattr(a, 'intersection') and hasattr(a, 'difference'):
@@ -76,7 +76,7 @@ def diff(a, b, context=3, depth=0, fromfile='a', tofile='b'):
         raise DiffNotImplementedForType(type(a))
 
 class DataDiff(object):
-    
+
     def __init__(self, datatype, type_start_str=None, type_end_str=None, fromfile='a', tofile='b'):
         self.diffs = []
         self.datatype = datatype
@@ -96,34 +96,34 @@ class DataDiff(object):
 
     def context_end_container(self):
         self.diffs.append(('context_end_container', []))
-        
+
     def nested(self, datadiff):
         self.diffs.append(('datadiff', datadiff))
 
     def multi(self, change, items):
         self.diffs.append((change, items))
-        
+
     def delete(self, item):
         return self.multi('delete', [item])
-    
+
     def insert(self, item):
         return self.multi('insert', [item])
-    
+
     def equal(self, item):
         return self.multi('equal', [item])
-        
+
     def insert_multi(self, items):
         return self.multi('insert', items)
-    
+
     def delete_multi(self, items):
         return self.multi('delete', items)
-    
+
     def equal_multi(self, items):
         return self.multi('equal', items)
-    
+
     def __str__(self):
         return self.stringify()
-        
+
     def stringify(self, depth=0, include_preamble=True):
         if not self.diffs:
             return ''
@@ -160,10 +160,10 @@ class DataDiff(object):
                 output.append(' '*depth + "%s%r," % (ch, item))
         output.append(' '*depth + self.type_end_str)
         return '\n'.join(output)
-    
+
     def __nonzero__(self):
         return self.__bool__()
-    
+
     def __bool__(self):
         return bool([d for d in self.diffs if d[0] != 'equal'])
 
@@ -178,11 +178,11 @@ def hashable(s):
             ret = frozenset(s)
         else:
             ret = s
-        
+
         # make it recursive
         if type(ret) == tuple:
             ret = tuple(hashable(_) for _ in ret)
-        
+
         # validate
         hash(ret)
     except TypeError:
@@ -234,7 +234,7 @@ def diff_seq(a, b, context=3, depth=0, fromfile='a', tofile='b'):
                     except DiffTypeError:
                         consecutive_deletes.append(a2)
                         consecutive_inserts.append(b2)
-                
+
                 # differing lengths get truncated by zip()
                 # here we handle the truncated items
                 ddiff.delete_multi(consecutive_deletes)
