@@ -56,6 +56,7 @@ def unified_diff_strings(a, b, fromfile='', tofile='', fromfiledate='', tofileda
                                   lineterm=''))
 
 def diff(a, b, context=3, depth=0, fromfile='a', tofile='b'):
+    basestring = basestring if sys.version[0] == 2 else str
     if isinstance(a, basestring) and isinstance(b, basestring):
         # special cases
         if '\n' in a or '\n' in b:
