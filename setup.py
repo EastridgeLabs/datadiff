@@ -86,7 +86,7 @@ exec(open('datadiff/version.py').read())
 setup(
     name = 'datadiff',
     packages = find_packages(),
-    version = __version__,
+    version = "1.1.6",
     description = 'DataDiff is a library to provide human-readable diffs of python data structures.',
     long_description = __doc__,
     test_suite = "nose.collector",
